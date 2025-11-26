@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npx ng build",
+  "outputDirectory": "dist/fraud-dashboard/browser",
+  "installCommand": "npm install --legacy-peer-deps",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
