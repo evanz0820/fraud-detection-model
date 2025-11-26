@@ -1,0 +1,318 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+        <h1>Credit Card Fraud Detection</h1>
+      </div>
+      <div class="header-status">
+        <span class="status-indicator" [class.connected]="apiStatus === 'connected'" [class.checking]="apiStatus === 'checking'">
+          <span class="status-dot"></span>
+          {{ apiStatus === 'connected' ? 'API Connected' : apiStatus === 'checking' ? 'Checking...' : 'API Disconnected (Demo Mode)' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Main Content -->
+  <main *ngIf="!isLoading" class="dashboard-main">
+    <!-- Overview Cards -->
+    <section class="overview-section">
+      <div class="card stat-card">
+        <div class="stat-icon transactions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total Transactions</span>
+          <span class="stat-value">{{ formatNumber(dashboardStats?.overview?.total_transactions || 0) }}</span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-icon fraud">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Fraud Detected</span>
+          <span class="stat-value fraud-value">{{ formatNumber(dashboardStats?.overview?.total_fraud_detected || 0) }}</span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-icon rate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="20" x2="12" y2="10"/>
+            <line x1="18" y1="20" x2="18" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Fraud Rate</span>
+          <span class="stat-value">{{ (dashboardStats?.overview?.fraud_rate || 0).toFixed(3) }}%</span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-icon accuracy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Model Accuracy</span>
+          <span class="stat-value accuracy-value">{{ (dashboardStats?.overview?.model_accuracy || 0).toFixed(2) }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Model Information -->
+    <section class="model-info-section">
+      <div class="card model-info-card">
+        <h2>Model Information</h2>
+        <div class="model-details">
+          <div class="detail-item">
+            <span class="detail-label">Model Type</span>
+            <span class="detail-value">{{ modelInfo?.architecture?.type || 'Neural Network' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Architecture</span>
+            <span class="detail-value">{{ modelInfo?.architecture?.layers?.join(' → ') || '128 → 64 → 32' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Activation</span>
+            <span class="detail-value">{{ modelInfo?.architecture?.activation || 'ReLU' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Dropout</span>
+            <span class="detail-value">{{ modelInfo?.architecture?.dropout || 0.3 }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Optimal Threshold</span>
+            <span class="detail-value">{{ (modelMetrics?.optimal_threshold || 0.5).toFixed(4) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="card metrics-grid">
+        <h2>Performance Metrics</h2>
+        <div class="metrics-items">
+          <div class="metric-item">
+            <span class="metric-value">{{ formatPercentage(modelMetrics?.accuracy || 0) }}</span>
+            <span class="metric-label">Accuracy</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-value">{{ formatPercentage(modelMetrics?.precision || 0) }}</span>
+            <span class="metric-label">Precision</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-value">{{ formatPercentage(modelMetrics?.recall || 0) }}</span>
+            <span class="metric-label">Recall</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-value">{{ formatPercentage(modelMetrics?.f1_score || 0) }}</span>
+            <span class="metric-label">F1 Score</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-value">{{ formatPercentage(modelMetrics?.roc_auc || 0) }}</span>
+            <span class="metric-label">ROC-AUC</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-section">
+      <!-- Performance Radar Chart -->
+      <div class="card chart-card">
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="performanceRadarData"
+            [options]="performanceRadarOptions"
+            type="radar">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Confusion Matrix -->
+      <div class="card chart-card">
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="confusionMatrixData"
+            [options]="confusionMatrixOptions"
+            type="bar">
+          </canvas>
+        </div>
+        <div class="confusion-legend">
+          <div class="legend-item">
+            <span class="legend-color tn"></span>
+            <span>TN: {{ dashboardStats?.confusion_matrix?.true_negative | number }}</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color fp"></span>
+            <span>FP: {{ dashboardStats?.confusion_matrix?.false_positive | number }}</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color fn"></span>
+            <span>FN: {{ dashboardStats?.confusion_matrix?.false_negative | number }}</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color tp"></span>
+            <span>TP: {{ dashboardStats?.confusion_matrix?.true_positive | number }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Loss -->
+      <div class="card chart-card">
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="trainingLossData"
+            [options]="trainingLossOptions"
+            type="line">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Risk Distribution -->
+      <div class="card chart-card">
+        <div class="chart-container doughnut">
+          <canvas baseChart
+            [data]="riskDistributionData"
+            [options]="riskDistributionOptions"
+            type="doughnut">
+          </canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hourly Distribution -->
+    <section class="hourly-section">
+      <div class="card chart-card full-width">
+        <div class="chart-container wide">
+          <canvas baseChart
+            [data]="hourlyDistributionData"
+            [options]="hourlyDistributionOptions"
+            type="bar">
+          </canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Transaction Simulation -->
+    <section class="live-section">
+      <div class="card live-card">
+        <div class="live-header">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="live-icon">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Live Transaction Monitor
+          </h2>
+          <button class="stream-btn" [class.active]="isStreaming" (click)="toggleTransactionStream()">
+            <span class="btn-dot"></span>
+            {{ isStreaming ? 'Stop Stream' : 'Start Stream' }}
+          </button>
+        </div>
+
+        <div class="transactions-list" *ngIf="recentTransactions.length > 0">
+          <div class="transaction-item" *ngFor="let txn of recentTransactions" 
+               [class.fraud]="txn.prediction.is_fraud">
+            <div class="txn-info">
+              <span class="txn-id">{{ txn.transaction.id }}</span>
+              <span class="txn-time">{{ formatTime(txn.transaction.timestamp) }}</span>
+            </div>
+            <div class="txn-amount">
+              {{ formatCurrency(txn.transaction.amount) }}
+            </div>
+            <div class="txn-risk" [class]="getRiskClass(txn.prediction.risk_level)">
+              {{ txn.prediction.risk_level }}
+            </div>
+            <div class="txn-probability">
+              <div class="prob-bar">
+                <div class="prob-fill" [style.width.%]="txn.prediction.fraud_probability * 100"
+                     [class.high]="txn.prediction.fraud_probability > 0.5"></div>
+              </div>
+              <span>{{ (txn.prediction.fraud_probability * 100).toFixed(1) }}%</span>
+            </div>
+            <div class="txn-status">
+              <span class="status-badge" [class.fraud]="txn.prediction.is_fraud">
+                {{ txn.prediction.is_fraud ? 'FRAUD' : 'SAFE' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="no-transactions" *ngIf="recentTransactions.length === 0 && !isStreaming">
+          <p>Click "Start Stream" to simulate live transactions</p>
+        </div>
+        
+        <div class="streaming-indicator" *ngIf="isStreaming && recentTransactions.length === 0">
+          <div class="pulse"></div>
+          <p>Waiting for transactions...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dataset Information -->
+    <section class="dataset-section">
+      <div class="card dataset-card">
+        <h2>Dataset Information</h2>
+        <div class="dataset-details">
+          <p class="dataset-description">
+            The dataset contains credit card transactions made by European cardholders in September 2013.
+            Features V1-V28 are principal components obtained from PCA transformation for confidentiality.
+          </p>
+          <div class="dataset-stats">
+            <div class="dataset-stat">
+              <span class="stat-num">{{ formatNumber(modelInfo?.dataset_info?.total_transactions || 284807) }}</span>
+              <span class="stat-desc">Total Records</span>
+            </div>
+            <div class="dataset-stat">
+              <span class="stat-num">30</span>
+              <span class="stat-desc">Features</span>
+            </div>
+            <div class="dataset-stat">
+              <span class="stat-num">{{ formatNumber(modelInfo?.dataset_info?.fraud_count || 492) }}</span>
+              <span class="stat-desc">Fraud Cases</span>
+            </div>
+            <div class="dataset-stat">
+              <span class="stat-num">0.172%</span>
+              <span class="stat-desc">Imbalance Ratio</span>
+            </div>
+          </div>
+          <div class="dataset-source">
+            <strong>Source:</strong> 
+            <a href="https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud" target="_blank">
+              Kaggle - Credit Card Fraud Detection
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <p>Credit Card Fraud Detection Dashboard | Built with PyTorch &amp; Angular</p>
+  </footer>
+</div>

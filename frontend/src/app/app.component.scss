@@ -1,0 +1,155 @@
+$primary: #3b82f6;
+$success: #10b981;
+$warning: #f59e0b;
+$danger: #ef4444;
+$purple: #8b5cf6;
+$dark: #1e293b;
+$darker: #0f172a;
+$gray: #64748b;
+
+* { box-sizing: border-box; }
+
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, $darker 0%, $dark 100%);
+  color: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.dashboard-header {
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  .header-content { max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+  .logo-section { display: flex; align-items: center; gap: 12px;
+    .logo-icon { width: 36px; height: 36px; color: $primary; }
+    h1 { font-size: 1.5rem; font-weight: 600; margin: 0; background: linear-gradient(90deg, $primary, $purple); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  }
+  .status-indicator { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; font-size: 0.875rem;
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: $danger; }
+    &.connected .status-dot { background: $success; animation: pulse 2s infinite; }
+    &.checking .status-dot { background: $warning; animation: blink 1s infinite; }
+  }
+}
+
+.loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; gap: 1rem;
+  .spinner { width: 48px; height: 48px; border: 3px solid rgba(59, 130, 246, 0.2); border-top-color: $primary; border-radius: 50%; animation: spin 1s linear infinite; }
+  p { color: $gray; }
+}
+
+.dashboard-main { max-width: 1600px; margin: 0 auto; padding: 2rem; }
+
+.card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(10px);
+  h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 1rem 0; color: white; }
+}
+
+.overview-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;
+  @media (max-width: 1200px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.stat-card { display: flex; align-items: center; gap: 1rem;
+  .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    svg { width: 24px; height: 24px; }
+    &.transactions { background: rgba(59, 130, 246, 0.2); color: $primary; }
+    &.fraud { background: rgba(239, 68, 68, 0.2); color: $danger; }
+    &.rate { background: rgba(245, 158, 11, 0.2); color: $warning; }
+    &.accuracy { background: rgba(16, 185, 129, 0.2); color: $success; }
+  }
+  .stat-content { display: flex; flex-direction: column;
+    .stat-label { font-size: 0.875rem; color: $gray; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; &.fraud-value { color: $danger; } &.accuracy-value { color: $success; } }
+  }
+}
+
+.model-info-section { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.model-info-card .model-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+  .detail-item { display: flex; flex-direction: column; gap: 4px;
+    .detail-label { font-size: 0.75rem; color: $gray; text-transform: uppercase; }
+    .detail-value { font-size: 1rem; font-weight: 500; color: white; }
+  }
+}
+
+.metrics-grid .metrics-items { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;
+  @media (max-width: 700px) { grid-template-columns: repeat(3, 1fr); }
+  .metric-item { text-align: center; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 12px;
+    .metric-value { display: block; font-size: 1.25rem; font-weight: 700; color: $primary; }
+    .metric-label { display: block; font-size: 0.75rem; color: $gray; margin-top: 4px; }
+  }
+}
+
+.charts-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+
+.chart-card .chart-container { height: 280px; position: relative; &.doughnut { height: 250px; } &.wide { height: 300px; } }
+.chart-card .confusion-legend { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap;
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem;
+    .legend-color { width: 12px; height: 12px; border-radius: 3px; &.tn { background: $success; } &.fp { background: $danger; } &.fn { background: $warning; } &.tp { background: $primary; } }
+  }
+}
+
+.hourly-section { margin-bottom: 2rem; .full-width { width: 100%; } }
+.live-section { margin-bottom: 2rem; }
+
+.live-card {
+  .live-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+    h2 { display: flex; align-items: center; gap: 8px; margin: 0; .live-icon { width: 20px; height: 20px; color: $danger; } }
+    .stream-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(239, 68, 68, 0.2); border: 1px solid $danger; border-radius: 8px; color: $danger; font-size: 0.875rem; font-weight: 500; cursor: pointer;
+      .btn-dot { width: 8px; height: 8px; border-radius: 50%; background: $danger; }
+      &:hover { background: rgba(239, 68, 68, 0.3); }
+      &.active { background: $danger; color: white; .btn-dot { background: white; animation: pulse 1.5s infinite; } }
+    }
+  }
+  .transactions-list { display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; }
+  .transaction-item { display: grid; grid-template-columns: 2fr 1fr 80px 1fr 80px; align-items: center; gap: 1rem; padding: 12px 16px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border-left: 3px solid $success; animation: slideIn 0.3s ease-out;
+    &.fraud { border-left-color: $danger; background: rgba(239, 68, 68, 0.1); }
+    @media (max-width: 800px) { grid-template-columns: 1fr 1fr; }
+    .txn-info { display: flex; flex-direction: column; gap: 2px; .txn-id { font-weight: 600; font-size: 0.875rem; } .txn-time { font-size: 0.75rem; color: $gray; } }
+    .txn-amount { font-weight: 600; font-size: 1rem; }
+    .txn-risk { font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 4px; text-align: center;
+      &.risk-low { background: rgba(16, 185, 129, 0.2); color: $success; }
+      &.risk-medium { background: rgba(245, 158, 11, 0.2); color: $warning; }
+      &.risk-high { background: rgba(239, 68, 68, 0.2); color: $danger; }
+    }
+    .txn-probability { display: flex; align-items: center; gap: 8px;
+      .prob-bar { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;
+        .prob-fill { height: 100%; background: $success; &.high { background: $danger; } }
+      }
+      span { font-size: 0.75rem; min-width: 40px; text-align: right; }
+    }
+    .txn-status .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: rgba(16, 185, 129, 0.2); color: $success;
+      &.fraud { background: rgba(239, 68, 68, 0.2); color: $danger; }
+    }
+  }
+  .no-transactions, .streaming-indicator { text-align: center; padding: 3rem; color: $gray;
+    .pulse { width: 48px; height: 48px; margin: 0 auto 1rem; border-radius: 50%; background: rgba(239, 68, 68, 0.3); animation: pulse 1.5s infinite; }
+  }
+}
+
+.dataset-section { margin-bottom: 2rem; }
+.dataset-card {
+  .dataset-description { color: $gray; line-height: 1.6; margin-bottom: 1.5rem; }
+  .dataset-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;
+    @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
+    .dataset-stat { text-align: center; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 12px;
+      .stat-num { display: block; font-size: 1.25rem; font-weight: 700; color: $purple; }
+      .stat-desc { display: block; font-size: 0.75rem; color: $gray; margin-top: 4px; }
+    }
+  }
+  .dataset-source { font-size: 0.875rem; color: $gray; a { color: $primary; text-decoration: none; &:hover { text-decoration: underline; } } }
+}
+
+.dashboard-footer { text-align: center; padding: 2rem; color: $gray; font-size: 0.875rem; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
